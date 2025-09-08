@@ -278,23 +278,43 @@ document.addEventListener("click", (e) => {
 });
 
 // --- Export Data ---
-document.getElementById("export-btn").addEventListener("click", () => {
-  const transactions = JSON.parse(localStorage.getItem("transactions")) || [];
-  const targets = JSON.parse(localStorage.getItem("targets")) || [];
-
-  const data = { transactions, targets };
+document.getElementById("export-btn").addEventListener("click", async () => {
+  const data = {
+    transactions: JSON.parse(localStorage.getItem("transactions")) || [],
+    targets: JSON.parse(localStorage.getItem("targets")) || []
+  };
 
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
 
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "funds-tracker-backup.json"; // Suggests filename
-  a.click();
-
-  URL.revokeObjectURL(url);
+  // ✅ Modern browsers / Android WebView: show "Save As…" dialog
+  if (window.showSaveFilePicker) {
+    try {
+      const handle = await window.showSaveFilePicker({
+        suggestedName: "funds-tracker-backup.json",
+        types: [{
+          description: "JSON Backup",
+          accept: { "application/json": [".json"] }
+        }]
+      });
+      const writable = await handle.createWritable();
+      await writable.write(blob);
+      await writable.close();
+      alert("✅ Backup saved!");
+    } catch (err) {
+      alert("❌ Save canceled or not supported.");
+    }
+  } else {
+    // Fallback for older WebView
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "funds-tracker-backup.json";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
 });
-
 
 
 
@@ -381,6 +401,7 @@ window.addEventListener("click", (e) => {
     aboutModal.style.display = "none";
   }
 });
+
 
 
 
