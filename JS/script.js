@@ -277,33 +277,27 @@ document.addEventListener("click", (e) => {
   }
 });
 
-document.getElementById("export-btn").addEventListener("click", () => {
+// --- Export Data ---
+document.getElementById("exportData")?.addEventListener("click", () => {
   const transactions = JSON.parse(localStorage.getItem("transactions")) || [];
   const targets = JSON.parse(localStorage.getItem("targets")) || [];
 
   const data = { transactions, targets };
-
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
 
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "funds-tracker-backup.json";
-
-  document.body.appendChild(a); // ✅ append to DOM
-  a.click();                    // ✅ trigger download
-  document.body.removeChild(a); // ✅ cleanup
-
-  URL.revokeObjectURL(url);
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "funds-tracker-data.json";
+  link.click();
 });
 
 
 // --- Import Data ---
-document.getElementById("import-btn").addEventListener("click", () => {
-  document.getElementById("import-file").click();
+document.getElementById("importData")?.addEventListener("click", () => {
+  document.getElementById("importFile").click();
 });
 
-document.getElementById("import-file").addEventListener("change", (event) => {
+document.getElementById("importFile")?.addEventListener("change", (event) => {
   const file = event.target.files[0];
   if (!file) return;
 
@@ -311,17 +305,15 @@ document.getElementById("import-file").addEventListener("change", (event) => {
   reader.onload = (e) => {
     try {
       const data = JSON.parse(e.target.result);
-
       if (data.transactions) {
         localStorage.setItem("transactions", JSON.stringify(data.transactions));
       }
       if (data.targets) {
         localStorage.setItem("targets", JSON.stringify(data.targets));
       }
-
-      alert("Data imported successfully! Refreshing...");
+      alert("✅ Data imported successfully!");
       location.reload();
-    } catch (err) {
+    } catch {
       alert("❌ Invalid JSON file");
     }
   };
@@ -329,8 +321,8 @@ document.getElementById("import-file").addEventListener("change", (event) => {
 });
 
 // --- Reset Data ---
-document.getElementById("reset-btn").addEventListener("click", () => {
-  if (confirm("Are you sure you want to reset all data? This cannot be undone.")) {
+document.getElementById("resetData")?.addEventListener("click", () => {
+  if (confirm("Are you sure you want to reset all data?")) {
     localStorage.removeItem("transactions");
     localStorage.removeItem("targets");
     alert("All data has been reset.");
@@ -381,6 +373,7 @@ window.addEventListener("click", (e) => {
     aboutModal.style.display = "none";
   }
 });
+
 
 
 
