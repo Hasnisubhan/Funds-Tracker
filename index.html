@@ -28,7 +28,19 @@
 	<p id="help-btn" class="help-btn"><i class="fa-solid fa-question"></i></p>
 </div>
 
-
+  <!-- Right: Dropdown -->
+  <div class="dropdown">
+    <button class="dropbtn"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+    	<div class="dropdown-content">
+      		<a href="setup.html"><i class="fa-solid fa-edit"></i> Edit Seetu</a>
+  			<a id="exportData"><i class="fa-solid fa-file-export"></i> Export</a>
+  			<a id="importData"><i class="fa-solid fa-file-import"></i> Import</a>
+				<!-- Hidden file input for import -->
+				<input type="file" id="importFile" accept="application/json" style="display:none;">
+      			<a href="about.html"><i class="fa-solid fa-info"></i> About</a>
+				<a href="#" id="resetPaymentsa"><i class="fa-solid fa-rotate-left"></i> Logout</a>
+    	</div>
+  </div>
 <!-- About Modal -->
 <div id="about-modal" class="modal">
   <div class="modal-content">
@@ -127,10 +139,69 @@
     navigator.serviceWorker.register("sw.js");
   }
 </script>
+<script>
+  // --- Export Data ---
+  document.getElementById("exportData")?.addEventListener("click", () => {
+    const plan = JSON.parse(localStorage.getItem("plan")) || {};
+    const members = JSON.parse(localStorage.getItem("members")) || [];
+    const payments = JSON.parse(localStorage.getItem("payments")) || {};
 
+    const data = { plan, members, payments };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
 
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "seetu-data.json";
+    link.click();
+  });
+
+</script>
+<script>
+	  // --- Import Data ---
+  document.getElementById("importData")?.addEventListener("click", () => {
+    document.getElementById("importFile").click();
+  });
+
+  document.getElementById("importFile")?.addEventListener("change", (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const data = JSON.parse(e.target.result);
+        if (data.plan && data.members && data.payments !== undefined) {
+          localStorage.setItem("plan", JSON.stringify(data.plan));
+          localStorage.setItem("members", JSON.stringify(data.members));
+          localStorage.setItem("payments", JSON.stringify(data.payments));
+          alert("Data imported successfully!");
+          location.reload();
+        } else {
+          alert("Invalid file format.");
+        }
+      } catch {
+        alert("Error reading file.");
+      }
+    };
+    reader.readAsText(file);
+  });
+</script>
+	<script>
+		  document.getElementById("resetPaymentsa")?.addEventListener("click", (e) => {
+    e.preventDefault(); // prevent page jump
+
+    if (confirm("Are you sure you want to logout?")) {
+      // Clear all localStorage data for a fresh login
+      localStorage.clear();
+
+      // Redirect back to login page
+      window.location.href = "auth.html";
+    }
+  });
+	</script>
 </body>
 </html>
+
 
 
 
