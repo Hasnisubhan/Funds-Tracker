@@ -277,20 +277,20 @@ document.addEventListener("click", (e) => {
   }
 });
 
-  // --- Export Data ---
-  document.getElementById("exportData")?.addEventListener("click", () => {
-    const plan = JSON.parse(localStorage.getItem("plan")) || {};
-    const members = JSON.parse(localStorage.getItem("members")) || [];
-    const payments = JSON.parse(localStorage.getItem("payments")) || {};
+// --- Export Data ---
+document.getElementById("export-btn")?.addEventListener("click", () => {
+  const plan = JSON.parse(localStorage.getItem("plan")) || {};
+  const members = JSON.parse(localStorage.getItem("members")) || [];
+  const payments = JSON.parse(localStorage.getItem("payments")) || {};
 
-    const data = { plan, members, payments };
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  const data = { plan, members, payments };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
 
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = "seetu-data.json";
-    link.click();
-  });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "seetu-data.json";
+  link.click();
+});
 
 
 
@@ -377,6 +377,7 @@ window.addEventListener("click", (e) => {
     aboutModal.style.display = "none";
   }
 });
+
 
 
 
