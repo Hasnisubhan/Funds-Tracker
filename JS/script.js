@@ -277,59 +277,64 @@ document.addEventListener("click", (e) => {
   }
 });
 
-// --- Export Data ---
-document.getElementById("exportData")?.addEventListener("click", () => {
-  const transactions = JSON.parse(localStorage.getItem("transactions")) || [];
-  const targets = JSON.parse(localStorage.getItem("targets")) || [];
+ // --- Export Data ---
+  document.getElementById("exportData")?.addEventListener("click", () => {
+    const plan = JSON.parse(localStorage.getItem("plan")) || {};
+    const members = JSON.parse(localStorage.getItem("members")) || [];
+    const payments = JSON.parse(localStorage.getItem("payments")) || {};
 
-  const data = { transactions, targets };
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    const data = { plan, members, payments };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
 
-  const link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
-  link.download = "funds-tracker-data.json";
-  link.click();
-});
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "seetu-data.json";
+    link.click();
+  });
 
+  // --- Import Data ---
+  document.getElementById("importData")?.addEventListener("click", () => {
+    document.getElementById("importFile").click();
+  });
 
-// --- Import Data ---
-document.getElementById("importData")?.addEventListener("click", () => {
-  document.getElementById("importFile").click();
-});
+  document.getElementById("importFile")?.addEventListener("change", (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
 
-document.getElementById("importFile")?.addEventListener("change", (event) => {
-  const file = event.target.files[0];
-  if (!file) return;
-
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    try {
-      const data = JSON.parse(e.target.result);
-      if (data.transactions) {
-        localStorage.setItem("transactions", JSON.stringify(data.transactions));
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const data = JSON.parse(e.target.result);
+        if (data.plan && data.members && data.payments !== undefined) {
+          localStorage.setItem("plan", JSON.stringify(data.plan));
+          localStorage.setItem("members", JSON.stringify(data.members));
+          localStorage.setItem("payments", JSON.stringify(data.payments));
+          alert("Data imported successfully!");
+          location.reload();
+        } else {
+          alert("Invalid file format.");
+        }
+      } catch {
+        alert("Error reading file.");
       }
-      if (data.targets) {
-        localStorage.setItem("targets", JSON.stringify(data.targets));
-      }
-      alert("✅ Data imported successfully!");
-      location.reload();
-    } catch {
-      alert("❌ Invalid JSON file");
-    }
-  };
-  reader.readAsText(file);
-});
+    };
+    rea
 
+    
 // --- Reset Data ---
-document.getElementById("resetData")?.addEventListener("click", () => {
-  if (confirm("Are you sure you want to reset all data?")) {
-    localStorage.removeItem("transactions");
-    localStorage.removeItem("targets");
-    alert("All data has been reset.");
-    location.reload();
-  }
-});
+  document.getElementById("resetPaymentsa")?.addEventListener("click", (e) => {
+    e.preventDefault(); // prevent page jump
 
+    if (confirm("Are you sure you want to logout?")) {
+      // Clear all localStorage data for a fresh login
+      localStorage.clear();
+
+      // Redirect back to login page
+      window.location.href = "auth.html";
+    }
+  });
+
+    
 // --- Swipe to delete logic ---
 let startX = 0;
 let currentSwipe = null;
@@ -373,6 +378,7 @@ window.addEventListener("click", (e) => {
     aboutModal.style.display = "none";
   }
 });
+
 
 
 
