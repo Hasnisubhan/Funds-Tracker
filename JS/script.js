@@ -277,21 +277,25 @@ document.addEventListener("click", (e) => {
   }
 });
 
-// --- Export Data ---
-document.getElementById("export-btn")?.addEventListener("click", () => {
-  const plan = JSON.parse(localStorage.getItem("plan")) || {};
-  const members = JSON.parse(localStorage.getItem("members")) || [];
-  const payments = JSON.parse(localStorage.getItem("payments")) || {};
+document.getElementById("export-btn").addEventListener("click", () => {
+  const transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+  const targets = JSON.parse(localStorage.getItem("targets")) || [];
 
-  const data = { plan, members, payments };
+  const data = { transactions, targets };
+
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
 
-  const link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
-  link.download = "seetu-data.json";
-  link.click();
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "funds-tracker-backup.json";
+
+  document.body.appendChild(a); // ✅ append to DOM
+  a.click();                    // ✅ trigger download
+  document.body.removeChild(a); // ✅ cleanup
+
+  URL.revokeObjectURL(url);
 });
-
 
 
 // --- Import Data ---
@@ -377,6 +381,7 @@ window.addEventListener("click", (e) => {
     aboutModal.style.display = "none";
   }
 });
+
 
 
 
