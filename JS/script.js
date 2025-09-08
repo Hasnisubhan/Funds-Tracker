@@ -277,64 +277,67 @@ document.addEventListener("click", (e) => {
   }
 });
 
- // --- Export Data ---
-  document.getElementById("exportData")?.addEventListener("click", () => {
-    const plan = JSON.parse(localStorage.getItem("plan")) || {};
-    const members = JSON.parse(localStorage.getItem("members")) || [];
-    const payments = JSON.parse(localStorage.getItem("payments")) || {};
+// --- Export Data ---
+document.getElementById("export-btn").addEventListener("click", () => {
+  const transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+  const targets = JSON.parse(localStorage.getItem("targets")) || [];
 
-    const data = { plan, members, payments };
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  const data = { transactions, targets };
 
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = "seetu-data.json";
-    link.click();
-  });
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
 
-  // --- Import Data ---
-  document.getElementById("importData")?.addEventListener("click", () => {
-    document.getElementById("importFile").click();
-  });
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "funds-tracker-backup.json"; // Suggests filename
+  a.click();
 
-  document.getElementById("importFile")?.addEventListener("change", (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
+  URL.revokeObjectURL(url);
+});
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const data = JSON.parse(e.target.result);
-        if (data.plan && data.members && data.payments !== undefined) {
-          localStorage.setItem("plan", JSON.stringify(data.plan));
-          localStorage.setItem("members", JSON.stringify(data.members));
-          localStorage.setItem("payments", JSON.stringify(data.payments));
-          alert("Data imported successfully!");
-          location.reload();
-        } else {
-          alert("Invalid file format.");
-        }
-      } catch {
-        alert("Error reading file.");
+
+
+
+// --- Import Data ---
+document.getElementById("import-btn").addEventListener("click", () => {
+  document.getElementById("import-file").click();
+});
+
+document.getElementById("import-file").addEventListener("change", (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+
+      if (data.transactions) {
+        localStorage.setItem("transactions", JSON.stringify(data.transactions));
       }
-    };
-    rea
+      if (data.targets) {
+        localStorage.setItem("targets", JSON.stringify(data.targets));
+      }
 
-    
-// --- Reset Data ---
-  document.getElementById("resetPaymentsa")?.addEventListener("click", (e) => {
-    e.preventDefault(); // prevent page jump
-
-    if (confirm("Are you sure you want to logout?")) {
-      // Clear all localStorage data for a fresh login
-      localStorage.clear();
-
-      // Redirect back to login page
-      window.location.href = "auth.html";
+      alert("Data imported successfully! Refreshing...");
+      location.reload();
+    } catch (err) {
+      alert("❌ Invalid JSON file");
     }
-  });
+  };
+  reader.readAsText(file);
+});
 
-    
+// --- Reset Data ---
+document.getElementById("reset-btn").addEventListener("click", () => {
+  if (confirm("Are you sure you want to reset all data? This cannot be undone.")) {
+    localStorage.removeItem("transactions");
+    localStorage.removeItem("targets");
+    alert("All data has been reset.");
+    location.reload();
+  }
+});
+
 // --- Swipe to delete logic ---
 let startX = 0;
 let currentSwipe = null;
@@ -378,11 +381,6 @@ window.addEventListener("click", (e) => {
     aboutModal.style.display = "none";
   }
 });
-
-
-
-
-
 
 
 
